@@ -11,6 +11,7 @@
 void vga_init(void);
 void vga_disable_cursor(void);
 void kclear_screen(void);
+void kprint_char(char c);
 void kprint(const char* str);
 void kprintln(const char* str);
 

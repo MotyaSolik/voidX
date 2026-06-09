@@ -22,6 +22,12 @@ void kclear_screen(void) {
     }
 }
 
+
+void kslog(const  char* str) {
+    kprint("[LOG]");
+    kprintln(str);
+}
+
 void kprint_char(char c) {
     if (c == '\n') {
         cursor_x = 0;
