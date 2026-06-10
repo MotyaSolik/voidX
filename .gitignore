@@ -4,6 +4,7 @@ build/
 .vscode/
 
 compile_flags.txt
+qemu.log
 
 .DS_Store
 *.swp
