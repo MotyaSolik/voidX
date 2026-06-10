@@ -3,5 +3,7 @@ build/
 
 .vscode/
 
+compile_flags.txt
+
 .DS_Store
 *.swp

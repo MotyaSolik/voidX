@@ -5,14 +5,17 @@
 
 void kernel_main(void) {
     vga_init();
-    uint8_t last_scancode = 0;
     kprintln("VNL Kernel v0.0.1");
     kprintln("Initializating VNL...");
     init_gdt();
-    init_idt_kb();
-    __asm__ volatile("int $33"); 
+    init_idt_kb(); 
     kprintln("VNL Ready!");
+
+    char user_input[256];
     kprint("Write something:");
+    input_line(user_input);
+    kprint("You writed:");
+    kprint(user_input);
 
     while(1) {
         __asm__ volatile("hlt"); 

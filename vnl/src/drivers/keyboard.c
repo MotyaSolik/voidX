@@ -1,4 +1,13 @@
 #include "keyboard.h"
+#include <stdbool.h>
+
+#define KEYBOARD_BUFFER_SIZE 256
+
+static char input_buffer[KEYBOARD_BUFFER_SIZE];
+static int buffer_index = 0;
+
+volatile bool is_input_active = false;
+volatile bool is_line_ready = false;             
 
 const char kbd_us_set1[128] = {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',    
@@ -57,15 +66,62 @@ char scode2char(uint8_t scancode) {
     }
     return 0;
 }
+
+
 void keyboard_handler_c(void) {
     uint8_t scancode = inb(0x60);
     char charc = scode2char(scancode);
     
-
-    if (charc != 0) {
-        kprint_char(charc);
+    if (!is_input_active || charc == 0) {
+        outb(0x20, 0x20);
+        return;
     }
 
-    outb(0x20, 0x20); 
+    if (charc == '\n') {
+        input_buffer[buffer_index] = '\0';
+        is_line_ready = true;
+        kprint_char('\n');
+    }
+    else if (charc == '\b') {
+        if (buffer_index > 0) {
+            buffer_index--;
+            kprint_char('\b');
+        }
+    }
+    else {
+        if (buffer_index < KEYBOARD_BUFFER_SIZE - 1) {
+            input_buffer[buffer_index++] = charc;
+            kprint_char(charc);
+        }
+    }
+
+    outb(0x20, 0x20);
+}
+
+void input(void) {
+    buffer_index = 0;
+    input_buffer[0] = '\0';
+    is_line_ready = false;
+    is_input_active = true;
+}
+
+void input_stop(void) {
+    is_input_active = false;
+}
+
+void input_line(char* dest_buffer) {
+    input();
     
+    while (!is_line_ready) {
+        __asm__ volatile("hlt"); 
+    }
+    
+    int i = 0;
+    while (input_buffer[i] != '\0') {
+        dest_buffer[i] = input_buffer[i];
+        i++;
+    }
+    dest_buffer[i] = '\0';
+    
+    input_stop();
 }
