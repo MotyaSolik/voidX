@@ -46,8 +46,8 @@ $(OBJ_DIR)/%.o: %.asm
 
 run: all
 	$(QEMU) -kernel $(TARGET)
-
-
+rund: all
+	$(QEMU) -kernel $(TARGET) -d int,cpu_reset -D qemu.log
 clean:
 	rm -rf $(BUILD_DIR)
 	@echo "=> succesfully clean!"
