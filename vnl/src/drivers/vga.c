@@ -53,6 +53,31 @@ void kprint_char(char c) {
     }
 }
 
+void kprint_char_c(char c, uint8_t col) {
+    if (c == '\n') {
+        cursor_x = 0;
+        cursor_y++;
+    } 
+    // скип \r
+    else if (c == '\r') {
+        return;
+    }
+    else {
+        int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
+        video_memory[index] = c;
+        video_memory[index + 1] = col;
+        cursor_x++;
+    }
+
+    if (cursor_x >= VGA_WIDTH) {
+        cursor_x = 0;
+        cursor_y++;
+    }
+    if (cursor_y >= VGA_HEIGHT) {
+        cursor_y = 0; 
+    }
+}
+
 void kprint(const char* str) {
     while (*str != '\0') {
         kprint_char(*str++);
@@ -61,5 +86,16 @@ void kprint(const char* str) {
 
 void kprintln(const char* str) {
     kprint(str);
+    kprint_char('\n');
+}
+
+void kerr(const char* str) {
+    while (*str != '\0') {
+        kprint_char_c(*str++, 0x04);
+    }
+}
+
+void kerrln(const char* str) {
+    kerr(str);
     kprint_char('\n');
 }

@@ -1,6 +1,7 @@
 #ifndef VGA_H
 #define VGA_H
 
+#include <stdint.h>
 #include "ports.h"
 
 #define VGA_WIDTH 80
@@ -12,7 +13,10 @@ void vga_init(void);
 void vga_disable_cursor(void);
 void kclear_screen(void);
 void kprint_char(char c);
+void kprint_char_c(char c, uint8_t col);
 void kprint(const char* str);
+void kerr(const char* str);
 void kprintln(const char* str);
+void kerrln(const char* str);
 
 #endif
