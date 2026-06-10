@@ -37,6 +37,14 @@ void kprint_char(char c) {
     else if (c == '\r') {
         return;
     }
+    else if (c == '\b') {
+        if (cursor_x > 0) {
+            cursor_x--; // Сначала двигаем курсор назад!
+            int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
+            video_memory[index] = ' ';
+            video_memory[index + 1] = VGA_COLOR_WHITE_ON_BLACK;
+        }
+    }
     else {
         int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
         video_memory[index] = c;
@@ -48,9 +56,24 @@ void kprint_char(char c) {
         cursor_x = 0;
         cursor_y++;
     }
-    if (cursor_y >= VGA_HEIGHT) {
-        cursor_y = 0; 
+        if (cursor_y >= VGA_HEIGHT) {
+        for (int y = 1; y < VGA_HEIGHT; y++) {
+            for (int x = 0; x < VGA_WIDTH; x++) {
+                int src_idx = (y * VGA_WIDTH + x) * 2;
+                int dest_idx = ((y - 1) * VGA_WIDTH + x) * 2;
+                video_memory[dest_idx] = video_memory[src_idx];
+                video_memory[dest_idx + 1] = video_memory[src_idx + 1];
+            }
+        }
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            int index = ((VGA_HEIGHT - 1) * VGA_WIDTH + x) * 2;
+            video_memory[index] = ' ';
+            video_memory[index + 1] = VGA_COLOR_WHITE_ON_BLACK;
+        }
+
+        cursor_y = VGA_HEIGHT - 1;
     }
+
 }
 
 void kprint_char_c(char c, uint8_t col) {
