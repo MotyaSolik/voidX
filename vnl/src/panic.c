@@ -20,12 +20,14 @@ const char *exception_messages[] = {
 };
 
 void exception_handler_c(struct registers regs) {
+    vga_set_color(0x1C);
     kclear_screen();
 
-    kerrln("!!!!!!!!!!!!!!!!!!");
-    kerrln("!! KERNEL PANIC !!");
-    kerrln("!!!!!!!!!!!!!!!!!!\n");
+    kprintln("!!!!!!!!!!!!!!!!!!");
+    kprintln("!! KERNEL PANIC !!");
+    kprintln("!!!!!!!!!!!!!!!!!!\n");
 
+    vga_set_color(0x1F);
     kprintln(exception_messages[regs.int_no]);
 
     kprintln("\nThe system has been halted to prevent damage.\n");

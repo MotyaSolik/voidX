@@ -9,6 +9,7 @@
 
 #define VGA_COLOR_WHITE_ON_BLACK 0x0F
 
+void vga_set_color(uint8_t color);
 void vga_init(void);
 void vga_disable_cursor(void);
 void kclear_screen(void);

@@ -4,6 +4,12 @@ static volatile char* video_memory = (volatile char*)0xB8000;
 
 static int cursor_x = 0;
 static int cursor_y = 0;
+static uint8_t current_color = 0x0F; 
+
+void vga_set_color(uint8_t color) {
+    current_color = color;
+}
+
 
 void vga_init(void) { vga_disable_cursor(); kclear_screen(); }
 
@@ -18,7 +24,7 @@ void kclear_screen(void) {
     cursor_y = 0;
     for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT * 2; i += 2) {
         video_memory[i] = ' ';
-        video_memory[i+1] = VGA_COLOR_WHITE_ON_BLACK;
+        video_memory[i+1] = current_color;
     }
 }
 
@@ -42,13 +48,13 @@ void kprint_char(char c) {
             cursor_x--; // Сначала двигаем курсор назад!
             int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
             video_memory[index] = ' ';
-            video_memory[index + 1] = VGA_COLOR_WHITE_ON_BLACK;
+            video_memory[index + 1] = current_color;
         }
     }
     else {
         int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
         video_memory[index] = c;
-        video_memory[index + 1] = VGA_COLOR_WHITE_ON_BLACK;
+        video_memory[index + 1] = current_color;
         cursor_x++;
     }
 
@@ -76,31 +82,6 @@ void kprint_char(char c) {
 
 }
 
-void kprint_char_c(char c, uint8_t col) {
-    if (c == '\n') {
-        cursor_x = 0;
-        cursor_y++;
-    } 
-    // скип \r
-    else if (c == '\r') {
-        return;
-    }
-    else {
-        int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
-        video_memory[index] = c;
-        video_memory[index + 1] = col;
-        cursor_x++;
-    }
-
-    if (cursor_x >= VGA_WIDTH) {
-        cursor_x = 0;
-        cursor_y++;
-    }
-    if (cursor_y >= VGA_HEIGHT) {
-        cursor_y = 0; 
-    }
-}
-
 void kprint(const char* str) {
     while (*str != '\0') {
         kprint_char(*str++);
@@ -113,9 +94,10 @@ void kprintln(const char* str) {
 }
 
 void kerr(const char* str) {
-    while (*str != '\0') {
-        kprint_char_c(*str++, 0x04);
-    }
+    uint8_t old_color = current_color;
+    vga_set_color(0x04); // Переключаем на красный цвет текста на текущем фоне
+    kprint(str);         // Печатаем со всей логикой скроллинга!
+    vga_set_color(old_color); // Возвращаем старый цвет
 }
 
 void kerrln(const char* str) {
