@@ -20,6 +20,6 @@ extern struct idt_entry idt[256];
 extern struct idt_ptr idtp;
 
 
-void init_idt_kb(void);
+void init_idt(void);
 void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags);
 

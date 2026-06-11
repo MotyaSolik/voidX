@@ -122,3 +122,14 @@ void kerrln(const char* str) {
     kerr(str);
     kprint_char('\n');
 }
+
+void kprint_hex(uint32_t n) {
+    char hex_chars[] = "0123456789ABCDEF";
+    
+    kprint("0x");
+
+    for (int i = 28; i >= 0; i -= 4) {
+        uint8_t nibble = (n >> i) & 0x0F;
+        kprint_char(hex_chars[nibble]);
+    }
+}

@@ -2,6 +2,7 @@
 #include "drivers/keyboard.h"
 #include "drivers/idt.h"
 #include "drivers/gdt.h"
+#include "drivers/timer.h"
 #include "utils.h"
 
 void kernel_main(void) {
@@ -9,7 +10,8 @@ void kernel_main(void) {
     kprintln("VNL Kernel v0.1.0");
     kprintln("Initializating VNL...");
     init_gdt();
-    init_idt_kb(); 
+    init_idt(); 
+    init_timer();
     kprintln("VNL Ready!");
 
     char user_input[256];
@@ -28,10 +30,21 @@ void kernel_main(void) {
             kclear_screen();
         } else if (strcmp(user_input, "hello") == 0) {
             kprintln("Hello, VoidDuck! VoidX is working!");
-        } else if (user_input[0] != '\0') {
+        } else if (strcmp(user_input, "test") == 0) {
+            kprintln("Waiting 3 secs...");
+            sleep_s(3);
+            kprintln("Done!");
+        } else if (strcmp(user_input, "crash") == 0) {
+            kprint("Triggering division by zero...\n");
+            volatile int a = 5;
+            volatile int b = 0;
+            volatile int c = a / b;
+        }
+
+        else if (user_input[0] != '\0') {
             kerr("unknown: ");
             kerrln(user_input);
-        }
+        } 
     }
     
 }

@@ -18,5 +18,6 @@ void kprint(const char* str);
 void kerr(const char* str);
 void kprintln(const char* str);
 void kerrln(const char* str);
+void kprint_hex(uint32_t n);
 
 #endif

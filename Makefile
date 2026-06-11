@@ -10,12 +10,11 @@ LD = ld
 QEMU = qemu-system-i386
 
 NASMFLAGS = -f elf32
-CFLAGS = -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra -mno-80387 -mno-mmx -mno-sse -mno-sse2 -I$(VNL_DIR)/src 
+CFLAGS = -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra -mno-80387 -mno-mmx -mno-sse -mno-sse2 -fno-stack-protector -I$(VNL_DIR)/src 
 LDFLAGS = -m elf_i386 -T $(VNL_DIR)/linker.ld
 
 SRCS_C = $(shell find $(VNL_DIR) -name "*.c")
 SRCS_ASM = $(shell find $(VNL_DIR) -name "*.asm")
-
 
 OBJS = $(patsubst %, $(OBJ_DIR)/%, $(notdir $(SRCS_C:.c=.o))) \
        $(patsubst %, $(OBJ_DIR)/%, $(notdir $(SRCS_ASM:.asm=.o)))
