@@ -20,5 +20,5 @@ void kerr(const char* str);
 void kprintln(const char* str);
 void kerrln(const char* str);
 void kprint_hex(uint32_t n);
-
+void kslog(const char* str);
 #endif

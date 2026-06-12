@@ -30,8 +30,12 @@ void kclear_screen(void) {
 
 
 void kslog(const  char* str) {
+    uint8_t old_c = current_color;
+    vga_set_color(0x0E);
     kprint("[LOG]");
     kprintln(str);
+    vga_set_color(old_c);
+
 }
 
 void kprint_char(char c) {
