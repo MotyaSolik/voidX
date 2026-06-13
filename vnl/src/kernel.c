@@ -1,12 +1,19 @@
-#include "drivers/vga.h"
-#include "drivers/keyboard.h"
-#include "drivers/idt.h"
-#include "drivers/gdt.h"
-#include "drivers/timer.h"
-#include "drivers/pmm.h"
-#include "drivers/paging.h"
-#include "drivers/heap.h"
+//#include <vga.h">
+#include <keyboard.h>
+#include <idt.h>
+#include <gdt.h>
+#include <timer.h>
+#include <pmm.h>
+#include <paging.h>
+#include <heap.h>
+#include <ata.h>
 #include "utils.h"
+#include "fs/ff.h"
+#include <timer.h>
+
+struct registers;
+extern void exception_handler_c(struct registers regs); 
+
 
 void kernel_main(void) {
     vga_init();
@@ -21,7 +28,6 @@ void kernel_main(void) {
     vga_set_color(0x0B);
     kprintln("VNL Ready!");
     vga_set_color(0x0F);
-
     char user_input[256];
     kprintln("vxsh v0.1.0");
     vga_set_color(0x07);
@@ -40,10 +46,6 @@ void kernel_main(void) {
             kclear_screen();
         } else if (strcmp(user_input, "hello") == 0) {
             kprintln("Hello, VoidDuck! VoidX is working!");
-        } else if (strcmp(user_input, "test") == 0) {
-            kprintln("Waiting 3 secs...");
-            sleep_s(3);
-            kprintln("Done!");
         }
     
         else if (user_input[0] != '\0') {

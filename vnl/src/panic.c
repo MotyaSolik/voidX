@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "drivers/vga.h"
+#include <vga.h>
 
 struct registers {
     uint32_t gs, fs, es, ds;

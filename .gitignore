@@ -8,3 +8,5 @@ qemu.log
 
 .DS_Store
 *.swp
+
+sort.sh

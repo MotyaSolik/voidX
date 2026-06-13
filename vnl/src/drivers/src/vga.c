@@ -1,0 +1,121 @@
+#include <vga.h>
+
+static volatile char* video_memory = (volatile char*)0xB8000;
+
+static int cursor_x = 0;
+static int cursor_y = 0;
+static uint8_t current_color = 0x0F; 
+
+void vga_set_color(uint8_t color) {
+    current_color = color;
+}
+
+
+void vga_init(void) { vga_disable_cursor(); kclear_screen(); }
+
+void vga_disable_cursor(void) {
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
+
+void kclear_screen(void) {
+    cursor_x = 0;
+    cursor_y = 0;
+    for (int i = 0; i < VGA_WIDTH * VGA_HEIGHT * 2; i += 2) {
+        video_memory[i] = ' ';
+        video_memory[i+1] = current_color;
+    }
+}
+
+
+void kslog(const  char* str) {
+    uint8_t old_c = current_color;
+    vga_set_color(0x0E);
+    kprint("[LOG]");
+    kprintln(str);
+    vga_set_color(old_c);
+
+}
+
+void kprint_char(char c) {
+    if (c == '\n') {
+        cursor_x = 0;
+        cursor_y++;
+    } 
+    // скип \r
+    else if (c == '\r') {
+        return;
+    }
+    else if (c == '\b') {
+        if (cursor_x > 0) {
+            cursor_x--; // Сначала двигаем курсор назад!
+            int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
+            video_memory[index] = ' ';
+            video_memory[index + 1] = current_color;
+        }
+    }
+    else {
+        int index = (cursor_y * VGA_WIDTH + cursor_x) * 2;
+        video_memory[index] = c;
+        video_memory[index + 1] = current_color;
+        cursor_x++;
+    }
+
+    if (cursor_x >= VGA_WIDTH) {
+        cursor_x = 0;
+        cursor_y++;
+    }
+        if (cursor_y >= VGA_HEIGHT) {
+        for (int y = 1; y < VGA_HEIGHT; y++) {
+            for (int x = 0; x < VGA_WIDTH; x++) {
+                int src_idx = (y * VGA_WIDTH + x) * 2;
+                int dest_idx = ((y - 1) * VGA_WIDTH + x) * 2;
+                video_memory[dest_idx] = video_memory[src_idx];
+                video_memory[dest_idx + 1] = video_memory[src_idx + 1];
+            }
+        }
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            int index = ((VGA_HEIGHT - 1) * VGA_WIDTH + x) * 2;
+            video_memory[index] = ' ';
+            video_memory[index + 1] = VGA_COLOR_WHITE_ON_BLACK;
+        }
+
+        cursor_y = VGA_HEIGHT - 1;
+    }
+
+}
+
+void kprint(const char* str) {
+    while (*str != '\0') {
+        kprint_char(*str++);
+    }
+}
+
+void kprintln(const char* str) {
+    kprint(str);
+    kprint_char('\n');
+}
+
+void kerr(const char* str) {
+    uint8_t old_color = current_color;
+    vga_set_color(0x04); // Переключаем на красный цвет текста на текущем фоне
+    kprint(str);         // Печатаем со всей логикой скроллинга!
+    vga_set_color(old_color); // Возвращаем старый цвет
+}
+
+void kerrln(const char* str) {
+    kerr(str);
+    kprint_char('\n');
+}
+
+void kprint_hex(uint32_t n) {
+    char hex_chars[] = "0123456789ABCDEF";
+    
+    kprint("0x");
+
+    for (int i = 28; i >= 0; i -= 4) {
+        uint8_t nibble = (n >> i) & 0x0F;
+        kprint_char(hex_chars[nibble]);
+    }
+}

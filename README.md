@@ -1,6 +1,6 @@
 # VoidX OS
 
-My hobby x86 32-bit Operating System written in C and Assembly from scratch.
+My hobby x86 32-bit Operating System written in C and Assembly.
 
 ## Features
 - Custom bootstrapper via GRUB & Multiboot specification
@@ -8,6 +8,7 @@ My hobby x86 32-bit Operating System written in C and Assembly from scratch.
 - Keyboard driver
 - Simple shell
 - Kernel panic
+- FAT32 Support(FatFs)
 
 ## Structure
 - `vnl/` - Source code(`src/`), drivers(`src/drivers/`) and linker script(`linker.ld`)

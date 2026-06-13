@@ -10,7 +10,7 @@ LD = ld
 QEMU = qemu-system-i386
 
 NASMFLAGS = -f elf32
-CFLAGS = -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra -mno-80387 -mno-mmx -mno-sse -mno-sse2 -fno-stack-protector -I$(VNL_DIR)/src 
+CFLAGS = -m32 -std=gnu99 -ffreestanding -O2 -Wall -Wextra -mno-80387 -mno-mmx -mno-sse -mno-sse2 -fno-stack-protector -Ivnl/src/drivers/inc
 LDFLAGS = -m elf_i386 -T $(VNL_DIR)/linker.ld
 
 SRCS_C = $(shell find $(VNL_DIR) -name "*.c")
@@ -44,7 +44,7 @@ $(OBJ_DIR)/%.o: %.asm
 
 
 run: all
-	$(QEMU) -kernel $(TARGET)
+	$(QEMU) -kernel $(TARGET) -drive file=disk.img,format=raw,index=0,media=disk
 rund: all
 	$(QEMU) -kernel $(TARGET) -d int,cpu_reset -D qemu.log
 clean:
